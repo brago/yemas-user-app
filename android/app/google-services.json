@@ -1,0 +1,82 @@
+{
+  "project_info": {
+    "project_number": "870934454762",
+    "project_id": "yemas-1103",
+    "storage_bucket": "yemas-1103.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:870934454762:android:f172d8604c8b415e4d9293",
+        "android_client_info": {
+          "package_name": "com.yemass.provider"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "870934454762-43mg70m57nveehebk7krb71r8nfgj036.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBWpncEzioxdsJKX-hnIWfgcnDjxP1tORA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "870934454762-43mg70m57nveehebk7krb71r8nfgj036.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "870934454762-uokgb1mehtbt00riqsmjhb97p7bnct41.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.yemas.ios"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:870934454762:android:fa691bb3b3d4dfd94d9293",
+        "android_client_info": {
+          "package_name": "com.yemass.servicebooking"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "870934454762-43mg70m57nveehebk7krb71r8nfgj036.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBWpncEzioxdsJKX-hnIWfgcnDjxP1tORA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "870934454762-43mg70m57nveehebk7krb71r8nfgj036.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "870934454762-uokgb1mehtbt00riqsmjhb97p7bnct41.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.yemas.ios"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
