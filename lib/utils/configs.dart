@@ -1,9 +1,9 @@
 import 'package:country_picker/country_picker.dart';
 import 'package:flutter/material.dart';
 
-const APP_NAME = 'Yemas Service';
+const APP_NAME = 'Yemas';
 const APP_NAME_TAG_LINE = 'Application de services à domicile à la demande';
-var defaultPrimaryColor = Color(0xFF5F60B9);
+var defaultPrimaryColor = Color(0xFF7C3AED);
 
 // Don't add slash at the end of the url
 

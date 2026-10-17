@@ -14,7 +14,7 @@
 
     <application
         android:icon="@mipmap/ic_launcher"
-        android:label="Yemas Service User"
+        android:label="Yemas"
         android:requestLegacyExternalStorage="true"
         tools:replace="android:label">
         <meta-data
