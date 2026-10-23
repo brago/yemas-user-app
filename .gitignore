@@ -3,3 +3,9 @@ build/
 *.aab
 *.apk
 *.so
+
+# Signature Android (ne jamais committer)
+*.keystore
+*.jks
+key.properties
+**/key.properties
