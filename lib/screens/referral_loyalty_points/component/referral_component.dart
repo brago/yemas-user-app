@@ -35,9 +35,11 @@ class _ReferralComponentState extends State<ReferralComponent> {
 
   Future<void> _shareReferralCode(BuildContext context) async {
     try {
-      final result = await Share.share(
-        _getShareMessage(widget.codeConte.text),
-        subject: 'Join and Get Rewards! 🎁',
+      final result = await SharePlus.instance.share(
+        ShareParams(
+          text: _getShareMessage(widget.codeConte.text),
+          subject: 'Join and Get Rewards! 🎁',
+        ),
       );
 
       if (result.status == ShareResultStatus.success) {

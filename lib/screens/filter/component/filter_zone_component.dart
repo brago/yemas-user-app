@@ -53,63 +53,65 @@ class _FilterServiceZoneComponentState extends State<FilterServiceZoneComponent>
       return Observer(builder: (_) => LoaderWidget().visible(appStore.isLoading));
     }
 
-    return AnimatedListView(
-      slideConfiguration: sliderConfigurationGlobal,
-      itemCount: widget.providerList.length,
-      listAnimationType: ListAnimationType.FadeIn,
-      fadeInConfiguration: FadeInConfiguration(duration: 2.seconds),
-      itemBuilder: (context, index) {
-        ZoneModel data = widget.providerList[index];
-
-        return Container(
-          padding: const EdgeInsets.all(8),
-          margin: EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: selectedZoneId == data.id ? context.cardColor : context.scaffoldBackgroundColor,
-            borderRadius: radius(8),
-            border: Border.all(
-              color: selectedZoneId == data.id ? context.primaryColor : Colors.grey.withValues(alpha:0.3),
-            ),
-          ),
-          child: Row(
-            children: [
-              Radio<int>(
-                value: data.id.validate(),
-                groupValue: selectedZoneId,
-                activeColor: context.primaryColor,
-                onChanged: (value) {
-                  setState(() {
-                    if (selectedZoneId == value) {
-                      selectedZoneId = null;
-                    } else {
-                      selectedZoneId = value;
-                    }
-                  });
-                  if (widget.onZoneSelected != null) {
-                    widget.onZoneSelected!(selectedZoneId);
-                  }
-                },
-              ),
-              8.width,
-              Text(
-                data.name.validate(),
-                style: primaryTextStyle(),
-              ).expand(),
-            ],
-          ),
-        ).onTap(() {
-          setState(() {
-            if (selectedZoneId == data.id) {
-              selectedZoneId = null;
-            } else {
-              selectedZoneId = data.id.validate();
-            }
-          });
-          if (widget.onZoneSelected != null) {
-            widget.onZoneSelected!(selectedZoneId);
+    return RadioGroup<int>(
+      groupValue: selectedZoneId,
+      onChanged: (value) {
+        setState(() {
+          if (selectedZoneId == value) {
+            selectedZoneId = null;
+          } else {
+            selectedZoneId = value;
           }
         });
+        if (widget.onZoneSelected != null) {
+          widget.onZoneSelected!(selectedZoneId);
+        }
       },
+      child: AnimatedListView(
+        slideConfiguration: sliderConfigurationGlobal,
+        itemCount: widget.providerList.length,
+        listAnimationType: ListAnimationType.FadeIn,
+        fadeInConfiguration: FadeInConfiguration(duration: 2.seconds),
+        itemBuilder: (context, index) {
+          ZoneModel data = widget.providerList[index];
+
+          return Container(
+            padding: const EdgeInsets.all(8),
+            margin: EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: selectedZoneId == data.id ? context.cardColor : context.scaffoldBackgroundColor,
+              borderRadius: radius(8),
+              border: Border.all(
+                color: selectedZoneId == data.id ? context.primaryColor : Colors.grey.withValues(alpha: 0.3),
+              ),
+            ),
+            child: Row(
+              children: [
+                Radio<int>(
+                  value: data.id.validate(),
+                  activeColor: context.primaryColor,
+                ),
+                8.width,
+                Text(
+                  data.name.validate(),
+                  style: primaryTextStyle(),
+                ).expand(),
+              ],
+            ),
+          ).onTap(() {
+            setState(() {
+              if (selectedZoneId == data.id) {
+                selectedZoneId = null;
+              } else {
+                selectedZoneId = data.id.validate();
+              }
+            });
+            if (widget.onZoneSelected != null) {
+              widget.onZoneSelected!(selectedZoneId);
+            }
+          });
+        },
+      ),
     );
   }
 }
