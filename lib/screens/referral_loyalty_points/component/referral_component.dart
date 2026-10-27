@@ -13,7 +13,7 @@ import '../../../utils/dashed_rect.dart';
 import '../../../utils/images.dart';
 
 class ReferralComponent extends StatefulWidget {
-  TextEditingController codeConte = TextEditingController();
+  final TextEditingController codeConte;
 
   ReferralComponent({super.key, required this.codeConte}) {
     codeConte.text = appStore.referralCode.isNotEmpty ? appStore.referralCode : "";

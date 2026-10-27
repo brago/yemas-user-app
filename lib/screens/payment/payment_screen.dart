@@ -18,7 +18,6 @@ import '../../component/wallet_balance_component.dart';
 import '../../model/payment_gateway_response.dart';
 import '../../network/rest_apis.dart';
 import '../../services/airtel_money/airtel_money_service.dart';
-import '../../services/cinet_pay_services_new.dart';
 import '../../services/jeko_pay_services.dart';
 import '../../services/flutter_wave_service_new.dart';
 import '../../services/midtrans_service.dart';
