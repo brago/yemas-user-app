@@ -13,7 +13,7 @@ import '../../../utils/dashed_rect.dart';
 import '../../../utils/images.dart';
 
 class ReferralComponent extends StatefulWidget {
-  TextEditingController codeConte = TextEditingController();
+  final TextEditingController codeConte;
 
   ReferralComponent({super.key, required this.codeConte}) {
     codeConte.text = appStore.referralCode.isNotEmpty ? appStore.referralCode : "";
@@ -35,9 +35,11 @@ class _ReferralComponentState extends State<ReferralComponent> {
 
   Future<void> _shareReferralCode(BuildContext context) async {
     try {
-      final result = await Share.share(
-        _getShareMessage(widget.codeConte.text),
-        subject: 'Join and Get Rewards! 🎁',
+      final result = await SharePlus.instance.share(
+        ShareParams(
+          text: _getShareMessage(widget.codeConte.text),
+          subject: 'Join and Get Rewards! 🎁',
+        ),
       );
 
       if (result.status == ShareResultStatus.success) {

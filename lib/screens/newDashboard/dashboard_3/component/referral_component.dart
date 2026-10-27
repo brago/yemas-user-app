@@ -27,9 +27,11 @@ class _DashboardReferralComponentState extends State<DashboardReferralComponent>
 
   Future<void> _shareReferralCode() async {
     try {
-      final result = await Share.share(
-        shareMessage,
-        subject: 'Join and Get Rewards! 🎁',
+      final result = await SharePlus.instance.share(
+        ShareParams(
+          text: shareMessage,
+          subject: 'Join and Get Rewards! 🎁',
+        ),
       );
 
       if (result.status == ShareResultStatus.success) {
