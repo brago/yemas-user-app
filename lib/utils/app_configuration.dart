@@ -609,7 +609,7 @@ class AppConfigurationModel {
         currencyCode = map["currency_code"],
         currencyPosition = map["currency_position"],
         currencySymbol = map["currency_symbol"],
-        decimalPoint = map["decimal_point"],
+        decimalPoint = map["decimal_point"]?.toString(),
         googleMapKey = map["google_map_key"],
         advancePaymentStatus = map["advance_payment_status"],
         slotServiceStatus = map["slot_service_status"],
