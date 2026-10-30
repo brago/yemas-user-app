@@ -24,7 +24,7 @@ class JekoPayServices {
   }) async {
     appStore.setLoading(true);
     try {
-      final token = getStringAsync('token');
+      final token = appStore.token;
       final response = await http.post(
         Uri.parse('https://yemas-services.com/api/jeko/initiate'),
         headers: {
