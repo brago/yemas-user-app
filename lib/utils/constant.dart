@@ -207,6 +207,7 @@ const PAYMENT_METHOD_STRIPE = 'stripe';
 const PAYMENT_METHOD_RAZOR = 'razorPay';
 const PAYMENT_METHOD_FLUTTER_WAVE = 'flutterwave';
 const PAYMENT_METHOD_CINETPAY = 'cinet';
+const PAYMENT_METHOD_JEKO = 'jeko';
 const PAYMENT_METHOD_SADAD_PAYMENT = 'sadad';
 const PAYMENT_METHOD_PAYPAL = 'paypal';
 const PAYMENT_METHOD_PAYSTACK = 'paystack';

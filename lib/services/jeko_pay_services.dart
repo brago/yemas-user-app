@@ -19,7 +19,7 @@ class JekoPayServices {
 
   Future<void> payWithJeko({
     required BuildContext context,
-    required int bookingId,
+    int? bookingId,
     String paymentMethod = 'wave',
   }) async {
     appStore.setLoading(true);
@@ -34,7 +34,7 @@ class JekoPayServices {
         },
         body: jsonEncode({
           'amount': totalAmount.toInt(),
-          'booking_id': bookingId,
+          if (bookingId != null) 'booking_id': bookingId,
           'payment_method': paymentMethod,
         }),
       );
