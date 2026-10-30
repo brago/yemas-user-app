@@ -19,12 +19,12 @@ class JekoPayServices {
 
   Future<void> payWithJeko({
     required BuildContext context,
-    required int bookingId,
+    int? bookingId,
     String paymentMethod = 'wave',
   }) async {
     appStore.setLoading(true);
     try {
-      final token = getStringAsync('token');
+      final token = appStore.token;
       final response = await http.post(
         Uri.parse('https://yemas-services.com/api/jeko/initiate'),
         headers: {
@@ -34,7 +34,7 @@ class JekoPayServices {
         },
         body: jsonEncode({
           'amount': totalAmount.toInt(),
-          'booking_id': bookingId,
+          if (bookingId != null) 'booking_id': bookingId,
           'payment_method': paymentMethod,
         }),
       );

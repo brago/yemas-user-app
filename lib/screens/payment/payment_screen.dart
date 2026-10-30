@@ -130,7 +130,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
           );
         },
       );
-    } else if (currentPaymentMethod!.type == PAYMENT_METHOD_CINETPAY) {
+    } else if (currentPaymentMethod!.type == PAYMENT_METHOD_JEKO) {
       if (totalAmount < 100) {
         return toast('${language.totalAmountShouldBeMoreThan} ${100.toPriceFormat()}');
       }
@@ -139,7 +139,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
         totalAmount: totalAmount,
         onComplete: (p0) {
           savePay(
-            paymentMethod: PAYMENT_METHOD_CINETPAY,
+            paymentMethod: PAYMENT_METHOD_JEKO,
             paymentStatus: widget.isForAdvancePayment ? SERVICE_PAYMENT_STATUS_ADVANCE_PAID : SERVICE_PAYMENT_STATUS_PAID,
             txnId: p0['transaction_id'],
           );

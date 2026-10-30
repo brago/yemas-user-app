@@ -23,6 +23,7 @@ import '../../services/phone_pe/phone_pe_service.dart';
 import '../../services/razorpay_service_new.dart';
 import '../../services/sadad_services_new.dart';
 import '../../services/stripe_service_new.dart';
+import '../../services/jeko_pay_services.dart';
 import '../../utils/app_configuration.dart';
 import '../../utils/colors.dart';
 import '../../utils/configs.dart';
@@ -132,6 +133,24 @@ class _UserWalletBalanceScreenState extends State<UserWalletBalanceScreen> {
       cinetPayServices.payWithCinetPay(context: context).catchError((e) {
         appStore.setLoading(false);
         toast(e);
+      });
+    } else if (currentPaymentMethod!.type == PAYMENT_METHOD_JEKO) {
+      if (walletAmountCont.text.toDouble() < 100) {
+        return toast('${language.totalAmountShouldBeMoreThan} ${100.toPriceFormat()}');
+      }
+
+      JekoPayServices jekoServices = JekoPayServices(
+        paymentSetting: currentPaymentMethod!,
+        totalAmount: walletAmountCont.text.toDouble(),
+        onComplete: (p0) {
+          Map req = {"amount": walletAmountCont.text.toDouble(), "transaction_type": PAYMENT_METHOD_JEKO, "transaction_id": p0['transaction_id']};
+          walletTopUpApi(request: req);
+        },
+      );
+
+      jekoServices.payWithJeko(context: context).catchError((e) {
+        appStore.setLoading(false);
+        toast(e.toString());
       });
     } else if (currentPaymentMethod!.type == PAYMENT_METHOD_SADAD_PAYMENT) {
       SadadServicesNew sadadServices = SadadServicesNew(
