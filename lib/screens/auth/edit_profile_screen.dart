@@ -92,7 +92,7 @@ class EditProfileScreenState extends State<EditProfileScreen> {
 
     fNameCont.text = appStore.userFirstName;
     lNameCont.text = appStore.userLastName;
-    emailCont.text = appStore.userEmail;
+    emailCont.text = displayEmail(appStore.userEmail);
     userNameCont.text = appStore.userName;
     mobileCont.text = appStore.userContactNumber.split("-").last;
     countryId = appStore.countryId;
@@ -228,7 +228,8 @@ class EditProfileScreenState extends State<EditProfileScreen> {
     multiPartRequest.fields[UserKeys.userName] = userNameCont.text;
     // multiPartRequest.fields[UserKeys.userType] = appStore.loginType;
     multiPartRequest.fields[UserKeys.contactNumber] = buildMobileNumber();
-    multiPartRequest.fields[UserKeys.email] = emailCont.text;
+    // Keep the technical e-mail of SMS customers who leave the field empty.
+    multiPartRequest.fields[UserKeys.email] = emailCont.text.trim().isEmpty ? appStore.userEmail : emailCont.text.trim();
     multiPartRequest.fields[UserKeys.countryId] = countryId.toString();
     multiPartRequest.fields[UserKeys.stateId] = stateId.toString();
     multiPartRequest.fields[UserKeys.cityId] = cityId.toString();
@@ -462,6 +463,8 @@ class EditProfileScreenState extends State<EditProfileScreen> {
                     controller: emailCont,
                     focus: emailFocus,
                     nextFocus: mobileFocus,
+                    // Optional for customers who signed up with an SMS code.
+                    isValidationRequired: !isTechnicalEmail(appStore.userEmail),
                     errorThisFieldRequired: language.requiredText,
                     decoration: inputDecoration(context, labelText: language.hintEmailTxt),
                     suffix: ic_message.iconImage(size: 10).paddingAll(14),

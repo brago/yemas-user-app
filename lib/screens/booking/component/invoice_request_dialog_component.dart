@@ -29,7 +29,7 @@ class _InvoiceRequestDialogComponentState extends State<InvoiceRequestDialogComp
   }
 
   void init() async {
-    emailCont.text = appStore.userEmail.validate();
+    emailCont.text = displayEmail(appStore.userEmail);
   }
 
   Future<void> sentMail() async {
