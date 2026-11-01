@@ -2080,226 +2080,170 @@ Utilisez mon code de parrainage $referralCode pour obtenir des points de fidéli
   String unlockBenefits(String points) => 'Vous pouvez débloquer des avantages à la caisse une fois que vous avez accumulé $points points.';
 
   @override
-  // TODO: implement airtelMoneyPayment
-  String get airtelMoneyPayment => throw UnimplementedError();
+  String get airtelMoneyPayment => "Paiement Airtel Money";
 
   @override
-  // TODO: implement ambiguous
-  String get ambiguous => throw UnimplementedError();
+  String get ambiguous => "Ambigu";
 
   @override
-  // TODO: implement applied
-  String get applied => throw UnimplementedError();
+  String get applied => "Appliqué";
 
   @override
-  // TODO: implement back
-  String get back => throw UnimplementedError();
+  String get back => "Retour";
 
   @override
-  // TODO: implement chooseDateTime
-  String get chooseDateTime => throw UnimplementedError();
+  String get chooseDateTime => "Choisir la date et l'heure";
 
   @override
-  // TODO: implement couldNotFetchEncryption
-  String get couldNotFetchEncryption => throw UnimplementedError();
+  String get couldNotFetchEncryption => "Impossible de récupérer la clé de chiffrement";
 
   @override
-  // TODO: implement coupons
-  String get coupons => throw UnimplementedError();
+  String get coupons => "Coupons";
 
   @override
-  // TODO: implement doNotHonor
-  String get doNotHonor => throw UnimplementedError();
+  String get doNotHonor => "Transaction refusée";
 
   @override
-  // TODO: implement doYouWantTo
-  String get doYouWantTo => throw UnimplementedError();
+  String get doYouWantTo => "Voulez-vous retirer ce coupon ?";
 
   @override
-  // TODO: implement encryptionKeyHasBeen
-  String get encryptionKeyHasBeen => throw UnimplementedError();
+  String get encryptionKeyHasBeen => "La clé de chiffrement a bien été récupérée";
 
   @override
-  // TODO: implement enterYourMsisdnHere
-  String get enterYourMsisdnHere => throw UnimplementedError();
+  String get enterYourMsisdnHere => "Saisissez votre numéro de téléphone";
 
   @override
-  // TODO: implement exceedsWithdrawalAmountLimitS
-  String get exceedsWithdrawalAmountLimitS => throw UnimplementedError();
+  String get exceedsWithdrawalAmountLimitS => "Plafond de retrait dépassé";
 
   @override
-  // TODO: implement forBidden
-  String get forBidden => throw UnimplementedError();
+  String get forBidden => "Interdit";
 
   @override
-  // TODO: implement handymanList
-  String get handymanList => throw UnimplementedError();
+  String get handymanList => "Liste des artisans";
 
   @override
-  // TODO: implement inProcess
-  String get inProcess => throw UnimplementedError();
+  String get inProcess => "En cours";
 
   @override
-  // TODO: implement incorrectPin
-  String get incorrectPin => throw UnimplementedError();
+  String get incorrectPin => "Code PIN incorrect";
 
   @override
-  // TODO: implement incorrectPinHasBeen
-  String get incorrectPinHasBeen => throw UnimplementedError();
+  String get incorrectPinHasBeen => "Le code PIN saisi est incorrect";
 
   @override
-  // TODO: implement invalidAmount
-  String get invalidAmount => throw UnimplementedError();
+  String get invalidAmount => "Montant invalide";
 
   @override
-  // TODO: implement isAvailableGoTo
-  String get isAvailableGoTo => throw UnimplementedError();
+  String get isAvailableGoTo => "est disponible. Allez sur le Play Store pour télécharger la nouvelle version de l'application.";
 
   @override
-  // TODO: implement later
-  String get later => throw UnimplementedError();
+  String get later => "Plus tard";
 
   @override
-  // TODO: implement noHandymanFound
-  String get noHandymanFound => throw UnimplementedError();
+  String get noHandymanFound => "Aucun artisan trouvé";
 
   @override
-  // TODO: implement notEnoughBalance
-  String get notEnoughBalance => throw UnimplementedError();
+  String get notEnoughBalance => "Solde insuffisant";
 
   @override
-  // TODO: implement off
-  String get off => throw UnimplementedError();
+  String get off => "de réduction";
 
   @override
-  // TODO: implement payeeIsAlreadyInitiated
-  String get payeeIsAlreadyInitiated => throw UnimplementedError();
+  String get payeeIsAlreadyInitiated => "Le bénéficiaire est bloqué ou n'est pas inscrit sur Airtel Money";
 
   @override
-  // TODO: implement paymentSuccess
-  String get paymentSuccess => throw UnimplementedError();
+  String get paymentSuccess => "Paiement réussi";
 
   @override
-  // TODO: implement pleaseCheckThePayment
-  String get pleaseCheckThePayment => throw UnimplementedError();
+  String get pleaseCheckThePayment => "Vérifiez que la demande de paiement a bien été envoyée sur votre numéro";
 
   @override
-  // TODO: implement pleaseEnterAddressAnd
-  String get pleaseEnterAddressAnd => throw UnimplementedError();
+  String get pleaseEnterAddressAnd => "Veuillez saisir l'adresse, la date et le créneau de réservation";
 
   @override
-  // TODO: implement pleaseEnterYourAddress
-  String get pleaseEnterYourAddress => throw UnimplementedError();
+  String get pleaseEnterYourAddress => "Veuillez saisir votre adresse";
 
   @override
-  // TODO: implement pleaseSelectBookingDate
-  String get pleaseSelectBookingDate => throw UnimplementedError();
+  String get pleaseSelectBookingDate => "Veuillez choisir la date et le créneau de réservation";
 
   @override
-  // TODO: implement reason
-  String get reason => throw UnimplementedError();
+  String get reason => "Motif";
 
   @override
-  // TODO: implement recommendedForYou
-  String get recommendedForYou => throw UnimplementedError();
+  String get recommendedForYou => "Recommandé pour vous";
 
   @override
-  // TODO: implement redirectingToBookings
-  String get redirectingToBookings => throw UnimplementedError();
+  String get redirectingToBookings => "Redirection vers vos réservations…";
 
   @override
-  // TODO: implement refused
-  String get refused => throw UnimplementedError();
+  String get refused => "Refusé";
 
   @override
-  // TODO: implement success
-  String get success => throw UnimplementedError();
+  String get success => "Succès";
 
   @override
-  // TODO: implement team
-  String get team => throw UnimplementedError();
+  String get team => "Équipe";
 
   @override
-  // TODO: implement theAmountUserIs
-  String get theAmountUserIs => throw UnimplementedError();
+  String get theAmountUserIs => "Le montant à transférer est inférieur au minimum autorisé";
 
   @override
-  // TODO: implement theTransactionIsStill
-  String get theTransactionIsStill => throw UnimplementedError();
+  String get theTransactionIsStill => "La transaction est toujours en cours de traitement. Vérifiez son statut dans quelques instants.";
 
   @override
-  // TODO: implement theTransactionWasNot
-  String get theTransactionWasNot => throw UnimplementedError();
+  String get theTransactionWasNot => "La transaction est introuvable.";
 
   @override
-  // TODO: implement theTransactionWasRefused
-  String get theTransactionWasRefused => throw UnimplementedError();
+  String get theTransactionWasRefused => "La transaction a été refusée";
 
   @override
-  // TODO: implement theTransactionWasTimed
-  String get theTransactionWasTimed => throw UnimplementedError();
+  String get theTransactionWasTimed => "La transaction a expiré.";
 
   @override
-  // TODO: implement theUserHasExceeded
-  String get theUserHasExceeded => throw UnimplementedError();
+  String get theUserHasExceeded => "Vous avez dépassé la limite de transactions de votre portefeuille";
 
   @override
-  // TODO: implement thisIsAGeneric
-  String get thisIsAGeneric => throw UnimplementedError();
+  String get thisIsAGeneric => "Refus générique : plusieurs causes sont possibles";
 
   @override
-  // TODO: implement transactionHasBeenExpired
-  String get transactionHasBeenExpired => throw UnimplementedError();
+  String get transactionHasBeenExpired => "La transaction a expiré";
 
   @override
-  // TODO: implement transactionIdIsInvalid
-  String get transactionIdIsInvalid => throw UnimplementedError();
+  String get transactionIdIsInvalid => "Identifiant de transaction invalide";
 
   @override
-  // TODO: implement transactionInPendingState
-  String get transactionInPendingState => throw UnimplementedError();
+  String get transactionInPendingState => "Transaction en attente. Vérifiez à nouveau dans quelques instants";
 
   @override
-  // TODO: implement transactionIsInProcess
-  String get transactionIsInProcess => throw UnimplementedError();
+  String get transactionIsInProcess => "Transaction en cours…";
 
   @override
-  // TODO: implement transactionIsSuccessful
-  String get transactionIsSuccessful => throw UnimplementedError();
+  String get transactionIsSuccessful => "Transaction réussie";
 
   @override
-  // TODO: implement transactionNotFound
-  String get transactionNotFound => throw UnimplementedError();
+  String get transactionNotFound => "Transaction introuvable";
 
   @override
-  // TODO: implement transactionNotPermittedTo
-  String get transactionNotPermittedTo => throw UnimplementedError();
+  String get transactionNotPermittedTo => "Transaction non autorisée vers ce bénéficiaire";
 
   @override
-  // TODO: implement transactionTimedOut
-  String get transactionTimedOut => throw UnimplementedError();
+  String get transactionTimedOut => "Délai de transaction dépassé";
 
   @override
-  // TODO: implement useThisCodeToGet
-  String get useThisCodeToGet => throw UnimplementedError();
+  String get useThisCodeToGet => "Utilisez ce code pour obtenir";
 
   @override
-  // TODO: implement userDidnTEnterThePin
-  String get userDidnTEnterThePin => throw UnimplementedError();
+  String get userDidnTEnterThePin => "Le code PIN n'a pas été saisi";
 
   @override
-  // TODO: implement userWalletDoesNot
-  String get userWalletDoesNot => throw UnimplementedError();
+  String get userWalletDoesNot => "Votre portefeuille ne contient pas assez d'argent pour ce paiement";
 
   @override
-  // TODO: implement whyChooseMe
-  String get whyChooseMe => throw UnimplementedError();
+  String get whyChooseMe => "Pourquoi me choisir ?";
 
   @override
-  // TODO: implement whyChooseMeAs
-  String get whyChooseMeAs => throw UnimplementedError();
+  String get whyChooseMeAs => "Pourquoi me choisir comme prestataire de confiance";
 
   @override
-  // TODO: implement xSignatureAndPayloadDid
-  String get xSignatureAndPayloadDid => throw UnimplementedError();
+  String get xSignatureAndPayloadDid => "La signature ne correspond pas aux données envoyées";
 }
