@@ -805,3 +805,11 @@ String formatShopTime(String? dateTimeStr) {
 String formatShopTimeRange(String? startTime, String? endTime) {
   return '${formatDate(startTime, isTime: true)} - ${formatDate(endTime, isTime: true)}';
 }
+
+
+/// Customers who sign up with an SMS code get a technical e-mail from the server
+/// (tel0707...@sms.yemas-services.com). It must never be shown to them.
+bool isTechnicalEmail(String? email) => (email ?? '').toLowerCase().endsWith('@sms.yemas-services.com');
+
+/// The customer's e-mail as shown on screen ('' for a technical e-mail).
+String displayEmail(String? email) => isTechnicalEmail(email) ? '' : (email ?? '');

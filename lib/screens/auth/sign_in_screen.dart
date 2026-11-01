@@ -11,6 +11,9 @@ import 'package:booking_system_flutter/utils/configs.dart';
 import 'package:booking_system_flutter/utils/constant.dart';
 import 'package:booking_system_flutter/utils/images.dart';
 import 'package:booking_system_flutter/utils/string_extensions.dart';
+import 'package:country_picker/country_picker.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
@@ -42,9 +45,18 @@ class _SignInScreenState extends State<SignInScreen> {
 
   bool isRemember = true;
 
+  // Phone first: the e-mail form is behind a link ("Utiliser mon e-mail").
+  TextEditingController phoneCont = TextEditingController();
+  FocusNode phoneFocus = FocusNode();
+  Country selectedCountry = defaultCountry();
+  bool showEmailForm = false;
+
+  bool get phoneLoginAvailable => appConfigurationStore.socialLoginStatus && appConfigurationStore.otpLoginStatus && !getBoolAsync(HAS_IN_REVIEW);
+
   @override
   void initState() {
     super.initState();
+    showEmailForm = !phoneLoginAvailable;
     init();
   }
 
@@ -116,6 +128,7 @@ class _SignInScreenState extends State<SignInScreen> {
           // 'password': passwordCont.text.trim(),
           'social_image': googleUser.photoURL,
           'login_type': LOGIN_TYPE_GOOGLE,
+          'firebase_token': await googleUser.getIdToken(),
         };
         var loginResponse = await loginUser(request, isSocialLogin: true);
 
@@ -155,6 +168,7 @@ class _SignInScreenState extends State<SignInScreen> {
 
         req['first_name'] = firstName;
         req['last_name'] = lastName;
+        req['firebase_token'] = await FirebaseAuth.instance.currentUser?.getIdToken();
 
         await loginUser(req, isSocialLogin: true).then((value) async {
           await saveUserData(value.userData!);
@@ -179,8 +193,23 @@ class _SignInScreenState extends State<SignInScreen> {
 
   void otpSignIn() async {
     hideKeyboard(context);
+    if (phoneCont.text.trim().length < 8) {
+      toast('Entrez votre numéro de téléphone');
+      phoneFocus.requestFocus();
+      return;
+    }
+    OTPLoginScreen(phoneNumber: phoneCont.text.trim(), country: selectedCountry).launch(context);
+  }
 
-    const OTPLoginScreen().launch(context);
+  Future<void> changeCountry() async {
+    showCountryPicker(
+      context: context,
+      showPhoneCode: true,
+      onSelect: (Country country) {
+        selectedCountry = country;
+        setState(() {});
+      },
+    );
   }
 
   void onLoginSuccessRedirection() {
@@ -282,7 +311,14 @@ class _SignInScreenState extends State<SignInScreen> {
             ),
           ],
         ),
-        TextButton(
+        _partnerLink()
+      ],
+    );
+  }
+
+
+  Widget _partnerLink() {
+    return TextButton(
           onPressed: () {
             if (isAndroid) {
               if (getStringAsync(PROVIDER_PLAY_STORE_URL).isNotEmpty) {
@@ -299,7 +335,68 @@ class _SignInScreenState extends State<SignInScreen> {
             }
           },
           child: Text(language.lblRegisterAsPartner, style: boldTextStyle(color: primaryColor)),
-        )
+        );
+  }
+
+  /// Main way in: phone number, then a code by SMS.
+  Widget _buildPhoneWidget() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('Bienvenue !', style: boldTextStyle(size: 22)).center(),
+        8.height,
+        Text('Entrez votre numéro de téléphone pour continuer.', style: secondaryTextStyle(size: 14), textAlign: TextAlign.center).center(),
+        32.height,
+        Row(
+          children: [
+            Container(
+              height: 48.0,
+              decoration: BoxDecoration(color: context.cardColor, borderRadius: BorderRadius.circular(12.0)),
+              child: Row(
+                children: [
+                  Text("+${selectedCountry.phoneCode}", style: primaryTextStyle(size: 12)),
+                  Icon(Icons.arrow_drop_down, color: primaryColor),
+                ],
+              ).paddingOnly(left: 8),
+            ).onTap(() => changeCountry()),
+            10.width,
+            AppTextField(
+              controller: phoneCont,
+              focus: phoneFocus,
+              textFieldType: TextFieldType.PHONE,
+              isValidationRequired: false,
+              decoration: inputDecoration(context, labelText: 'Votre numéro de téléphone').copyWith(hintText: 'Ex. : ${selectedCountry.example}', hintStyle: secondaryTextStyle()),
+              onFieldSubmitted: (_) => otpSignIn(),
+            ).expand(),
+          ],
+        ),
+        24.height,
+        AppButton(
+          text: 'Recevoir un code par SMS',
+          color: primaryColor,
+          textColor: Colors.white,
+          width: context.width() - context.navigationBarHeight,
+          onTap: otpSignIn,
+        ),
+        12.height,
+        RichTextWidget(
+          textAlign: TextAlign.center,
+          list: [
+            TextSpan(text: 'En continuant, vous acceptez les ', style: secondaryTextStyle(size: 12)),
+            TextSpan(
+              text: 'conditions',
+              style: boldTextStyle(color: primaryColor, size: 12),
+              recognizer: TapGestureRecognizer()..onTap = () => checkIfLink(context, appConfigurationStore.termConditions, title: language.termsCondition),
+            ),
+            TextSpan(text: ' et la ', style: secondaryTextStyle(size: 12)),
+            TextSpan(
+              text: 'politique de confidentialité',
+              style: boldTextStyle(color: primaryColor, size: 12),
+              recognizer: TapGestureRecognizer()..onTap = () => checkIfLink(context, appConfigurationStore.privacyPolicy, title: language.privacyPolicy),
+            ),
+            TextSpan(text: '.', style: secondaryTextStyle(size: 12)),
+          ],
+        ).center(),
       ],
     );
   }
@@ -309,7 +406,7 @@ class _SignInScreenState extends State<SignInScreen> {
       return Column(
         children: [
           20.height,
-          if ((appConfigurationStore.googleLoginStatus || appConfigurationStore.otpLoginStatus) || (isIOS && appConfigurationStore.appleLoginStatus))
+          if (appConfigurationStore.googleLoginStatus || (isIOS && appConfigurationStore.appleLoginStatus))
             Row(
               children: [
                 Divider(color: context.dividerColor, thickness: 2).expand(),
@@ -343,29 +440,6 @@ class _SignInScreenState extends State<SignInScreen> {
               onTap: googleSignIn,
             ),
           if (appConfigurationStore.googleLoginStatus) 16.height,
-          if (appConfigurationStore.otpLoginStatus)
-            AppButton(
-              text: '',
-              color: context.cardColor,
-              padding: const EdgeInsets.all(8),
-              textStyle: boldTextStyle(),
-              width: context.width() - context.navigationBarHeight,
-              child: Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: boxDecorationWithRoundedCorners(
-                      backgroundColor: primaryColor.withValues(alpha:0.1),
-                      boxShape: BoxShape.circle,
-                    ),
-                    child: ic_calling.iconImage(size: 18, color: primaryColor).paddingAll(4),
-                  ),
-                  Text(language.lblSignInWithOTP, style: boldTextStyle(size: 12), textAlign: TextAlign.center).expand(),
-                ],
-              ),
-              onTap: otpSignIn,
-            ),
-          if (appConfigurationStore.otpLoginStatus) 16.height,
           if (isIOS)
             if (appConfigurationStore.appleLoginStatus)
               AppButton(
@@ -444,6 +518,16 @@ class _SignInScreenState extends State<SignInScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     (context.height() * 0.12).toInt().height,
+                    if (!showEmailForm) ...[
+                      _buildPhoneWidget(),
+                      if (!getBoolAsync(HAS_IN_REVIEW)) _buildSocialWidget(),
+                      16.height,
+                      TextButton(
+                        onPressed: () => setState(() => showEmailForm = true),
+                        child: Text('Utiliser mon e-mail et un mot de passe', style: secondaryTextStyle(color: primaryColor)),
+                      ),
+                      _partnerLink(),
+                    ] else ...[
                     _buildTopWidget(),
                     AutofillGroup(
                       child: Column(
@@ -472,8 +556,8 @@ class _SignInScreenState extends State<SignInScreen> {
                             validator: (val) {
                               if (val == null || val.isEmpty) {
                                 return language.requiredText;
-                              } else if (val.length < 8 || val.length > 12) {
-                                return language.passwordLengthShouldBe;
+                              } else if (val.length < 8) {
+                                return 'Au moins 8 caractères';
                               }
                               return null;
                             },
@@ -486,6 +570,12 @@ class _SignInScreenState extends State<SignInScreen> {
                     ),
                     _buildRememberWidget(),
                     if (!getBoolAsync(HAS_IN_REVIEW)) _buildSocialWidget(),
+                    if (phoneLoginAvailable)
+                      TextButton(
+                        onPressed: () => setState(() => showEmailForm = false),
+                        child: Text('Se connecter avec mon numéro de téléphone', style: secondaryTextStyle(color: primaryColor)),
+                      ),
+                    ],
                     30.height,
                   ],
                 );
