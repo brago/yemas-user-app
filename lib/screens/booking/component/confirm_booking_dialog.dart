@@ -1,3 +1,4 @@
+import 'package:booking_system_flutter/utils/analytics.dart';
 import 'package:booking_system_flutter/component/loader_widget.dart';
 import 'package:booking_system_flutter/generated/assets.dart';
 import 'package:booking_system_flutter/main.dart';
@@ -135,6 +136,11 @@ class _ConfirmBookingDialogState extends State<ConfirmBookingDialog> {
     appStore.setLoading(true);
     await saveBooking(request).then((bookingDetailResponse) async {
       appStore.setLoading(false);
+      Analytics.bookingCreated(
+        category: widget.data.serviceDetail!.categoryName,
+        service: widget.data.serviceDetail!.name,
+        amount: widget.bookingPrice,
+      );
 
       if (widget.data.serviceDetail != null && widget.data.serviceDetail!.isAdvancePayment && !widget.data.serviceDetail!.isFreeService && widget.data.serviceDetail!.isFixedService) {
         finish(context);

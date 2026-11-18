@@ -148,7 +148,7 @@ class ProfileFragmentState extends State<ProfileFragment> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Marquee(child: Text(appStore.userFullName, style: boldTextStyle(color: primaryColor, size: 16))),
-                                  Marquee(child: Text(appStore.userEmail, style: secondaryTextStyle())),
+                                  Marquee(child: Text(displayEmail(appStore.userEmail), style: secondaryTextStyle())),
                                 ],
                               ).expand(),
                             ],

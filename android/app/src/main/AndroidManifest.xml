@@ -114,4 +114,10 @@
             android:name="MyNavigationService"
             android:foregroundServiceType="location" />
     </application>
+    <!-- Lets the app find the phone's speech recognizer (Android 11+), for voice search. -->
+    <queries>
+        <intent>
+            <action android:name="android.speech.RecognitionService" />
+        </intent>
+    </queries>
 </manifest>

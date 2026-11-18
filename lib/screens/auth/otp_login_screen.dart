@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:booking_system_flutter/component/back_widget.dart';
 import 'package:booking_system_flutter/component/base_scaffold_body.dart';
 import 'package:booking_system_flutter/main.dart';
@@ -17,8 +15,14 @@ import '../../utils/configs.dart';
 import '../../utils/constant.dart';
 import '../dashboard/dashboard_screen.dart';
 
+/// Log in or sign up with a code received by SMS.
+/// Existing customers go straight to the app; new ones are only asked their name.
 class OTPLoginScreen extends StatefulWidget {
-  const OTPLoginScreen({Key? key}) : super(key: key);
+  /// Number already typed on the sign-in screen: the code is sent right away.
+  final String? phoneNumber;
+  final Country? country;
+
+  const OTPLoginScreen({Key? key, this.phoneNumber, this.country}) : super(key: key);
 
   @override
   State<OTPLoginScreen> createState() => _OTPLoginScreenState();
@@ -27,26 +31,30 @@ class OTPLoginScreen extends StatefulWidget {
 class _OTPLoginScreenState extends State<OTPLoginScreen> {
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
-  TextEditingController numberController = TextEditingController();
-  FocusNode _mobileNumberFocus = FocusNode();
+  final TextEditingController numberController = TextEditingController();
+  final FocusNode _mobileNumberFocus = FocusNode();
 
   Country selectedCountry = defaultCountry();
 
   String otpCode = '';
   String verificationId = '';
-
-  ValueNotifier _valueNotifier = ValueNotifier(true);
+  int? resendToken;
 
   bool isCodeSent = false;
+  bool isVerifying = false;
+
+  String get fullNumber => "+${selectedCountry.phoneCode} ${numberController.text.trim()}";
 
   @override
   void initState() {
     super.initState();
-    afterBuildCreated(() => init());
-  }
-
-  Future<void> init() async {
-    appStore.setLoading(false);
+    if (widget.country != null) selectedCountry = widget.country!;
+    if (widget.phoneNumber.validate().isNotEmpty) {
+      numberController.text = widget.phoneNumber!.trim();
+      afterBuildCreated(() => sendOTP());
+    } else {
+      afterBuildCreated(() => appStore.setLoading(false));
+    }
   }
 
   //region Methods
@@ -59,245 +67,201 @@ class _OTPLoginScreenState extends State<OTPLoginScreen> {
         inputDecoration: InputDecoration(
           labelText: language.search,
           prefixIcon: const Icon(Icons.search),
-          border: OutlineInputBorder(
-            borderSide: BorderSide(
-              color: const Color(0xFF8C98A8).withValues(alpha:0.2),
-            ),
-          ),
+          border: OutlineInputBorder(borderSide: BorderSide(color: const Color(0xFF8C98A8).withValues(alpha: 0.2))),
         ),
       ),
-      showPhoneCode: true, // optional. Shows phone code before the country name.
+      showPhoneCode: true,
       onSelect: (Country country) {
         selectedCountry = country;
-        log(jsonEncode(selectedCountry.toJson()));
         setState(() {});
       },
     );
   }
 
   Future<void> sendOTP() async {
-    if (formKey.currentState!.validate()) {
-      formKey.currentState!.save();
-      hideKeyboard(context);
+    if (numberController.text.trim().length < 8) {
+      toast('Entrez un numéro de téléphone valide');
+      return;
+    }
+    hideKeyboard(context);
+    appStore.setLoading(true);
 
-      appStore.setLoading(true);
-
-      toast(language.sendingOTP);
-
-      try {
-        await FirebaseAuth.instance.verifyPhoneNumber(
-          phoneNumber: "+${selectedCountry.phoneCode}${numberController.text.trim()}",
-          verificationCompleted: (PhoneAuthCredential credential) async {
-            toast(language.verified);
-
-            if (isAndroid) {
-              await FirebaseAuth.instance.signInWithCredential(credential);
-            }
-          },
-          verificationFailed: (FirebaseAuthException e) {
-            appStore.setLoading(false);
-            if (e.code == 'invalid-phone-number') {
-              toast(language.theEnteredCodeIsInvalidPleaseTryAgain, print: true);
-            } else {
-              toast(e.toString(), print: true);
-            }
-          },
-          codeSent: (String _verificationId, int? resendToken) async {
-            toast(language.otpCodeIsSentToYourMobileNumber);
-
-            appStore.setLoading(false);
-
-            verificationId = _verificationId;
-
-            if (verificationId.isNotEmpty) {
-              isCodeSent = true;
-              setState(() {});
-            } else {
-              //Handle
-            }
-          },
-          codeAutoRetrievalTimeout: (String verificationId) {
-            FirebaseAuth.instance.signOut();
-            isCodeSent = false;
-            setState(() {});
-          },
-        );
-      } on Exception catch (e) {
-        log(e);
-        appStore.setLoading(false);
-
-        toast(e.toString(), print: true);
-      }
+    try {
+      await FirebaseAuth.instance.verifyPhoneNumber(
+        phoneNumber: "+${selectedCountry.phoneCode}${numberController.text.trim()}",
+        forceResendingToken: resendToken,
+        // Android sometimes reads the SMS by itself: go on without typing the code.
+        verificationCompleted: (PhoneAuthCredential credential) async {
+          if (!isVerifying) await signInWithCredential(credential);
+        },
+        verificationFailed: (FirebaseAuthException e) {
+          appStore.setLoading(false);
+          if (e.code == 'invalid-phone-number') {
+            toast("Ce numéro n'est pas valide. Vérifiez-le.");
+          } else if (e.code == 'too-many-requests') {
+            toast('Trop de tentatives. Réessayez dans quelques minutes.');
+          } else {
+            toast(e.message ?? e.code, print: true);
+          }
+        },
+        codeSent: (String id, int? token) {
+          appStore.setLoading(false);
+          verificationId = id;
+          resendToken = token;
+          isCodeSent = id.isNotEmpty;
+          setState(() {});
+        },
+        codeAutoRetrievalTimeout: (String id) {
+          verificationId = id;
+        },
+      );
+    } on Exception catch (e) {
+      appStore.setLoading(false);
+      toast(e.toString(), print: true);
     }
   }
 
   Future<void> submitOtp() async {
-    log(otpCode);
-    if (otpCode.validate().isNotEmpty) {
-      if (otpCode.validate().length >= OTP_TEXT_FIELD_LENGTH) {
-        hideKeyboard(context);
-        appStore.setLoading(true);
-
-        try {
-          PhoneAuthCredential credential = PhoneAuthProvider.credential(verificationId: verificationId, smsCode: otpCode);
-          UserCredential credentials = await FirebaseAuth.instance.signInWithCredential(credential);
-
-          Map<String, dynamic> request = {
-            'username': numberController.text.trim(),
-            'password': numberController.text.trim(),
-            'login_type': LOGIN_TYPE_OTP,
-            "uid": credentials.user!.uid.validate(),
-          };
-
-          try {
-            await loginUser(request, isSocialLogin: true).then((loginResponse) async {
-              if (loginResponse.isUserExist.validate(value: true)) {
-                await saveUserData(loginResponse.userData!);
-                await appStore.setLoginType(LOGIN_TYPE_OTP);
-                DashboardScreen().launch(context, isNewTask: true, pageRouteAnimation: PageRouteAnimation.Fade);
-              } else {
-                appStore.setLoading(false);
-                finish(context);
-
-                SignUpScreen(
-                  isOTPLogin: true,
-                  phoneNumber: numberController.text.trim(),
-                  countryCode: selectedCountry.countryCode,
-                  uid: credentials.user!.uid.validate(),
-                  tokenForOTPCredentials: credential.token,
-                ).launch(context);
-              }
-            }).catchError((e) {
-              finish(context);
-              toast(e.toString());
-              appStore.setLoading(false);
-            });
-          } catch (e) {
-            appStore.setLoading(false);
-            toast(e.toString(), print: true);
-          }
-        } on FirebaseAuthException catch (e) {
-          appStore.setLoading(false);
-          if (e.code.toString() == 'invalid-verification-code') {
-            toast(language.theEnteredCodeIsInvalidPleaseTryAgain, print: true);
-          } else {
-            toast(e.message.toString(), print: true);
-          }
-        } on Exception catch (e) {
-          appStore.setLoading(false);
-          toast(e.toString(), print: true);
-        }
-      } else {
-        toast(language.pleaseEnterValidOTP);
-      }
-    } else {
-      toast(language.pleaseEnterValidOTP);
+    if (otpCode.validate().length < OTP_TEXT_FIELD_LENGTH) {
+      toast('Entrez les $OTP_TEXT_FIELD_LENGTH chiffres du code');
+      return;
     }
+    hideKeyboard(context);
+    await signInWithCredential(PhoneAuthProvider.credential(verificationId: verificationId, smsCode: otpCode));
   }
 
+  /// The phone number is proved: log in, or ask the name of a new customer.
+  Future<void> signInWithCredential(PhoneAuthCredential credential) async {
+    isVerifying = true;
+    appStore.setLoading(true);
+
+    try {
+      final UserCredential credentials = await FirebaseAuth.instance.signInWithCredential(credential);
+      final String uid = credentials.user!.uid.validate();
+      // Proof of the phone number for the server.
+      final String firebaseToken = (await credentials.user!.getIdToken()).validate();
+
+      final loginResponse = await loginUser({
+        'username': numberController.text.trim(),
+        'login_type': LOGIN_TYPE_OTP,
+        'uid': uid,
+        'firebase_token': firebaseToken,
+      }, isSocialLogin: true);
+
+      if (loginResponse.isUserExist.validate(value: true)) {
+        await saveUserData(loginResponse.userData!);
+        await appStore.setLoginType(LOGIN_TYPE_OTP);
+        appStore.setLoading(false);
+        DashboardScreen().launch(context, isNewTask: true, pageRouteAnimation: PageRouteAnimation.Fade);
+      } else {
+        appStore.setLoading(false);
+        SignUpScreen(
+          isOTPLogin: true,
+          phoneNumber: numberController.text.trim(),
+          countryCode: selectedCountry.countryCode,
+          uid: uid,
+          firebaseToken: firebaseToken,
+        ).launch(context, isNewTask: false);
+      }
+    } on FirebaseAuthException catch (e) {
+      appStore.setLoading(false);
+      if (e.code == 'invalid-verification-code') {
+        toast("Ce code n'est pas le bon. Vérifiez le SMS et réessayez.");
+      } else if (e.code == 'session-expired') {
+        toast('Le code a expiré. Touchez « Renvoyer le code ».');
+      } else {
+        toast(e.message ?? e.code, print: true);
+      }
+    } catch (e) {
+      appStore.setLoading(false);
+      toast(e.toString(), print: true);
+    } finally {
+      isVerifying = false;
+    }
+  }
   // endregion
 
-  Widget _buildMainWidget() {
-    if (isCodeSent) {
-      return Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
+  Widget _codeWidget() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        16.height,
+        Text('Entrez le code reçu par SMS au', style: secondaryTextStyle(size: 14), textAlign: TextAlign.center),
+        4.height,
+        Text(fullNumber, style: boldTextStyle(size: 16)),
+        32.height,
+        OTPTextField(
+          pinLength: OTP_TEXT_FIELD_LENGTH,
+          textStyle: primaryTextStyle(),
+          decoration: inputDecoration(context).copyWith(counter: const Offstage()),
+          onChanged: (s) => otpCode = s,
+          onCompleted: (pin) {
+            otpCode = pin;
+            submitOtp();
+          },
+        ).fit(),
+        30.height,
+        AppButton(onTap: submitOtp, text: 'Valider', color: primaryColor, textColor: Colors.white, width: context.width()),
+        16.height,
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            32.height,
-            OTPTextField(
-              pinLength: OTP_TEXT_FIELD_LENGTH,
-              textStyle: primaryTextStyle(),
-              decoration: inputDecoration(context).copyWith(
-                counter: const Offstage(),
-              ),
-              onChanged: (s) {
-                otpCode = s;
-                log(otpCode);
+            TextButton(
+              onPressed: () {
+                isCodeSent = false;
+                otpCode = '';
+                setState(() {});
               },
-              onCompleted: (pin) {
-                otpCode = pin;
-                submitOtp();
-              },
-            ).fit(),
-            30.height,
-            AppButton(
-              onTap: () {
-                submitOtp();
-              },
-              text: language.confirm,
-              color: primaryColor,
-              textColor: Colors.white,
-              width: context.width(),
+              child: Text('Modifier le numéro', style: secondaryTextStyle(color: primaryColor)),
+            ),
+            TextButton(
+              onPressed: sendOTP,
+              child: Text('Renvoyer le code', style: secondaryTextStyle(color: primaryColor)),
             ),
           ],
         ),
-      );
-    } else {
-      return Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Form(
-            key: formKey,
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                // Country code ...
-                Container(
-                  height: 48.0,
-                  decoration: BoxDecoration(
-                    color: context.cardColor,
-                    borderRadius: BorderRadius.circular(12.0),
-                  ),
-                  child: Center(
-                    child: ValueListenableBuilder(
-                      valueListenable: _valueNotifier,
-                      builder: (context, value, child) => Row(
-                        children: [
-                          Text(
-                            "+${selectedCountry.phoneCode}",
-                            style: primaryTextStyle(size: 12),
-                          ),
-                          Icon(
-                            Icons.arrow_drop_down,
-                            color: primaryColor,
-                          )
-                        ],
-                      ).paddingOnly(left: 8),
-                    ),
-                  ),
-                ).onTap(() => changeCountry()).fit(fit: BoxFit.cover),
-                10.width,
-                // Mobile number text field...
-                AppTextField(
-                  controller: numberController,
-                  focus: _mobileNumberFocus,
-                  textFieldType: TextFieldType.PHONE,
-                  decoration: inputDecoration(context).copyWith(
-                    hintText: '${language.lblExample}: ${selectedCountry.example}',
-                    hintStyle: secondaryTextStyle(),
-                  ),
-                  autoFocus: true,
-                  onFieldSubmitted: (s) {
-                    sendOTP();
-                  },
-                ).expand(),
-              ],
-            ),
+      ],
+    ).paddingAll(16);
+  }
+
+  Widget _numberWidget() {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('Nous allons vous envoyer un code par SMS.', style: secondaryTextStyle(size: 14)),
+        16.height,
+        Form(
+          key: formKey,
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Container(
+                height: 48.0,
+                decoration: BoxDecoration(color: context.cardColor, borderRadius: BorderRadius.circular(12.0)),
+                child: Row(
+                  children: [
+                    Text("+${selectedCountry.phoneCode}", style: primaryTextStyle(size: 12)),
+                    Icon(Icons.arrow_drop_down, color: primaryColor),
+                  ],
+                ).paddingOnly(left: 8),
+              ).onTap(() => changeCountry()),
+              10.width,
+              AppTextField(
+                controller: numberController,
+                focus: _mobileNumberFocus,
+                textFieldType: TextFieldType.PHONE,
+                decoration: inputDecoration(context).copyWith(hintText: 'Ex. : ${selectedCountry.example}', hintStyle: secondaryTextStyle()),
+                autoFocus: true,
+                onFieldSubmitted: (s) => sendOTP(),
+              ).expand(),
+            ],
           ),
-          30.height,
-          AppButton(
-            onTap: () {
-              sendOTP();
-            },
-            text: language.btnSendOtp,
-            color: primaryColor,
-            textColor: Colors.white,
-            width: context.width(),
-          ),
-        ],
-      );
-    }
+        ),
+        30.height,
+        AppButton(onTap: sendOTP, text: 'Recevoir un code par SMS', color: primaryColor, textColor: Colors.white, width: context.width()),
+      ],
+    );
   }
 
   @override
@@ -311,7 +275,7 @@ class _OTPLoginScreenState extends State<OTPLoginScreen> {
       onTap: () => hideKeyboard(context),
       child: Scaffold(
         appBar: AppBar(
-          title: Text(isCodeSent ? language.confirmOTP : language.lblEnterPhnNumber, style: boldTextStyle(size: APP_BAR_TEXT_SIZE)),
+          title: Text(isCodeSent ? 'Code reçu par SMS' : 'Votre numéro de téléphone', style: boldTextStyle(size: APP_BAR_TEXT_SIZE)),
           elevation: 0,
           backgroundColor: context.scaffoldBackgroundColor,
           leading: Navigator.of(context).canPop() ? BackWidget(iconColor: context.iconColor) : null,
@@ -321,7 +285,7 @@ class _OTPLoginScreenState extends State<OTPLoginScreen> {
         body: Body(
           child: Container(
             padding: const EdgeInsets.all(16),
-            child: _buildMainWidget(),
+            child: isCodeSent ? _codeWidget() : _numberWidget(),
           ),
         ),
       ),

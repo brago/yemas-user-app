@@ -458,7 +458,7 @@ Future<List<ServiceData>> searchServiceAPI({
 
   // Construct query parameters
   String categoryIds = categoryId.isNotEmpty ? 'category_id=$categoryId&' : '';
-  String searchPara = search.isNotEmpty ? 'search=$search&' : '';
+  String searchPara = search.isNotEmpty ? 'search=${Uri.encodeQueryComponent(search)}&' : '';
   String providerIds = providerId.isNotEmpty ? 'provider_id=$providerId&' : '';
   String isPriceMinPara = isPriceMin.isNotEmpty ? 'is_price_min=$isPriceMin&' : '';
   String isPriceMaxPara = isPriceMax.isNotEmpty ? 'is_price_max=$isPriceMax&' : '';

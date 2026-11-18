@@ -163,48 +163,46 @@ class _SliderLocationComponentState extends State<SliderLocationComponent> {
           left: 16,
           child: Row(
             children: [
+              // Search bar: tap to search, or tap the mic to speak right away.
+              GestureDetector(
+                onTap: () => SearchServiceScreen(featuredList: widget.featuredList).launch(context),
+                child: Container(
+                  padding: const EdgeInsets.fromLTRB(16, 8, 8, 8),
+                  decoration: commonDecoration,
+                  child: Row(
+                    children: [
+                      ic_search.iconImage(color: primaryColor),
+                      10.width,
+                      Text('Que recherchez-vous ?', style: secondaryTextStyle(size: 14), maxLines: 1, overflow: TextOverflow.ellipsis).expand(),
+                      GestureDetector(
+                        onTap: () => SearchServiceScreen(featuredList: widget.featuredList, startListening: true).launch(context),
+                        child: Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(shape: BoxShape.circle, color: primaryColor),
+                          child: const Icon(Icons.mic_rounded, color: Colors.white, size: 22),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ).expand(),
+              16.width,
+              // Location: limits results to the user's area.
               Observer(
                 builder: (context) {
-                  return AppButton(
-                    padding: const EdgeInsets.all(0),
-                    width: context.width(),
-                    child: Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: commonDecoration,
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          ic_location.iconImage(color: appStore.isDarkMode ? Colors.white : Colors.black),
-                          8.width,
-                          Text(
-                            appStore.isCurrentLocation ? getStringAsync(CURRENT_ADDRESS) : language.lblLocationOff,
-                            style: secondaryTextStyle(),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ).expand(),
-                          8.width,
-                          ic_active_location.iconImage(size: 24, color: appStore.isCurrentLocation ? primaryColor : grey),
-                        ],
-                      ),
-                    ),
-                    onTap: () async {
+                  return GestureDetector(
+                    onTap: () {
                       locationWiseService(context, () {
                         widget.callback?.call();
                       });
                     },
+                    child: Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: commonDecoration,
+                      child: ic_active_location.iconImage(size: 24, color: appStore.isCurrentLocation ? primaryColor : grey),
+                    ),
                   );
                 },
-              ).expand(),
-              16.width,
-              GestureDetector(
-                onTap: () {
-                  SearchServiceScreen(featuredList: widget.featuredList).launch(context);
-                },
-                child: Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: commonDecoration,
-                  child: ic_search.iconImage(color: primaryColor),
-                ),
               ),
             ],
           ),
