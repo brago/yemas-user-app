@@ -1,3 +1,4 @@
+import 'package:booking_system_flutter/utils/analytics.dart';
 import 'dart:math';
 
 import 'package:booking_system_flutter/component/back_widget.dart';
@@ -165,6 +166,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
       }
 
       appStore.setLoading(false);
+      Analytics.signUp(widget.isOTPLogin ? 'phone' : 'email');
       toast('Bienvenue ${firstName.validate()} !');
       DashboardScreen().launch(context, isNewTask: true, pageRouteAnimation: PageRouteAnimation.Fade);
     } catch (e) {

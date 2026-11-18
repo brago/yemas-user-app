@@ -1,3 +1,4 @@
+import 'package:booking_system_flutter/utils/analytics.dart';
 import 'package:booking_system_flutter/app_theme.dart';
 import 'package:booking_system_flutter/component/base_scaffold_widget.dart';
 import 'package:booking_system_flutter/component/loader_widget.dart';
@@ -220,6 +221,7 @@ class _BookPostJobRequestScreenState extends State<BookPostJobRequestScreen> {
 
     saveBooking(request).then((value) {
       appStore.setLoading(false);
+      Analytics.bookingCreated(service: 'post_job', amount: widget.postJobDetailResponse.postRequestDetail!.jobPrice);
 
       DashboardScreen(redirectToBooking: true).launch(context, isNewTask: true, pageRouteAnimation: PageRouteAnimation.Fade);
     }).catchError((e) {
